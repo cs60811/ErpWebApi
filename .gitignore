@@ -39,3 +39,11 @@ _ReSharper.Caches/
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+# Tooling
+chrome_profile_notebooklm/
+.gemini/
+.agent/
+node_modules/
+dist/
+dist-ssr/
