@@ -21,6 +21,13 @@ jobs:
       - name: Build with dotnet
         run: dotnet build backend/backend.csproj --configuration Release
 
+      - name: Replace placeholders in appsettings.json
+        run: |
+          sed -i "s/\${DB_HOST}/${{ secrets.DB_HOST }}/g" backend/appsettings.json
+          sed -i "s/\${DB_PORT}/${{ secrets.DB_PORT }}/g" backend/appsettings.json
+          sed -i "s/\${DB_USER}/${{ secrets.DB_USER }}/g" backend/appsettings.json
+          sed -i "s/\${DB_PASS}/${{ secrets.DB_PASS }}/g" backend/appsettings.json
+
       - name: dotnet publish
         run: dotnet publish backend/backend.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
