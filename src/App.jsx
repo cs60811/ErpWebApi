@@ -19,7 +19,7 @@ function App() {
     try {
       setRecordStatus('Recording...');
       const apiUrl = import.meta.env.VITE_API_URL;
-      const response = await fetch(`${apiUrl}/record`, {
+      const response = await fetch(`${apiUrl}/line/record`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -45,7 +45,7 @@ function App() {
   const fetchData = async () => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL;
-      const response = await fetch(`${apiUrl}/dashboard`);
+      const response = await fetch(`${apiUrl}/line/dashboard`);
       if (response.ok) {
         const data = await response.json();
         setAppData(data);

@@ -20,7 +20,7 @@ const ERPBinding = ({ userId, erpAccount, onBind }) => {
     
     try {
       const apiUrl = import.meta.env.VITE_API_URL;
-      const response = await fetch(`${apiUrl}/bind-erp`, {
+      const response = await fetch(`${apiUrl}/line/bind-erp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
