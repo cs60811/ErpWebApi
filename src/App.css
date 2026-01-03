@@ -1,0 +1,199 @@
+/* App Styling */
+.App {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.content-area {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.app-header {
+  text-align: center;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.5rem;
+  border-radius: 16px;
+  backdrop-filter: blur(5px);
+}
+
+.tabs button {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 12px;
+  padding: 0.5rem 1rem;
+  flex: 1;
+}
+
+.tabs button.active {
+  background: #3b82f6;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.profile-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 4px solid #3b82f6;
+  margin-bottom: 1.5rem;
+}
+
+.erp-status-card {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 1rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.text-success { color: #10b981; font-weight: bold; }
+.text-warning { color: #f59e0b; font-weight: bold; }
+
+/* ERP Binding Component */
+.erp-binding-card {
+  text-align: left;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.status-badge.bound { background: #10b98122; color: #10b981; border: 1px solid #10b98144; }
+.status-badge.not.bound { background: #f59e0b22; color: #f59e0b; border: 1px solid #f59e0b44; }
+
+.input-group {
+  margin-bottom: 1.25rem;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.input-group input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.8rem;
+  border-radius: 12px;
+  color: white;
+  box-sizing: border-box;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Product Order Component */
+.order-system {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.product-card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 20px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s;
+}
+
+.product-card:hover { border-color: #3b82f644; transform: scale(1.02); }
+
+.product-card img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.product-card h4 { margin: 0.5rem 0; font-size: 0.95rem; }
+.product-card .price { color: #60a5fa; font-weight: bold; margin-bottom: 1rem; }
+
+.cart-section {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1.5rem;
+  border-radius: 24px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.cart-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+}
+
+.cart-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.remove-btn {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #ef4444 !important;
+  padding: 0 0.5rem !important;
+  font-size: 1.2rem !important;
+  border: none !important;
+}
+
+.cart-footer {
+  margin-top: 1.5rem;
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.checkout-btn {
+  width: 100%;
+  background: linear-gradient(to right, #10b981, #059669) !important;
+  font-size: 1.1rem !important;
+  padding: 1rem !important;
+}
+
+.footer-info {
+  font-size: 0.8rem;
+  color: #475569;
+  text-align: center;
+  padding: 1rem;
+}
