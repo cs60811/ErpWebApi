@@ -12,7 +12,7 @@ namespace backend.Models
         
         [Required]
         [Column("UserId")]
-        public string UserId { get; set; } = string.Empty;
+        public string UserId { get; set; } = string.Empty; // Line UserId
         
         [Column("DisplayName")]
         public string? DisplayName { get; set; }
@@ -29,11 +29,8 @@ namespace backend.Models
         [Column("UpdateTime")]
         public DateTime UpdateTime { get; set; } = DateTime.UtcNow;
 
-        [Column("ErpId")]
-        public string? ErpId { get; set; }
-
-        [Column("IsErpBound")]
-        public bool IsErpBound { get; set; } = false;
+        // Navigation property for bindings
+        public ICollection<UserCustomer>? Customers { get; set; }
     }
 
     public class DashboardData

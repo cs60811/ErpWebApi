@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260104084335_UpdateUserProfileBinding")]
+    partial class UpdateUserProfileBinding
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace backend.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("backend.Models.ErpUser", b =>
+            modelBuilder.Entity("backend.Models.ErpConfig", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -48,7 +51,21 @@ namespace backend.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<string>("LoginType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("UID")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("UPWD")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
@@ -61,43 +78,7 @@ namespace backend.Migrations
                     b.HasIndex("ErpCode")
                         .IsUnique();
 
-                    b.ToTable("ErpUsers");
-                });
-
-            modelBuilder.Entity("backend.Models.UserCustomer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreateTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CustomerUid")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("CustomerUpwd")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<int>("ErpUserId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("UserProfileId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ErpUserId");
-
-                    b.HasIndex("UserProfileId");
-
-                    b.ToTable("UserCustomers");
+                    b.ToTable("ErpConfigs");
                 });
 
             modelBuilder.Entity("backend.Models.UserProfile", b =>
@@ -115,6 +96,22 @@ namespace backend.Migrations
                     b.Property<string>("DisplayName")
                         .HasColumnType("text")
                         .HasColumnName("DisplayName");
+
+                    b.Property<string>("ErpId")
+                        .HasColumnType("text")
+                        .HasColumnName("ErpId");
+
+                    b.Property<string>("ErpUid")
+                        .HasColumnType("text")
+                        .HasColumnName("ErpUid");
+
+                    b.Property<string>("ErpUpwd")
+                        .HasColumnType("text")
+                        .HasColumnName("ErpUpwd");
+
+                    b.Property<bool>("IsErpBound")
+                        .HasColumnType("boolean")
+                        .HasColumnName("IsErpBound");
 
                     b.Property<string>("PictureUrl")
                         .HasColumnType("text")
@@ -139,33 +136,6 @@ namespace backend.Migrations
                         .IsUnique();
 
                     b.ToTable("UserProfiles");
-                });
-
-            modelBuilder.Entity("backend.Models.UserCustomer", b =>
-                {
-                    b.HasOne("backend.Models.ErpUser", "ErpUser")
-                        .WithMany("Customers")
-                        .HasForeignKey("ErpUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("backend.Models.UserProfile", "UserProfile")
-                        .WithMany("Customers")
-                        .HasForeignKey("UserProfileId");
-
-                    b.Navigation("ErpUser");
-
-                    b.Navigation("UserProfile");
-                });
-
-            modelBuilder.Entity("backend.Models.ErpUser", b =>
-                {
-                    b.Navigation("Customers");
-                });
-
-            modelBuilder.Entity("backend.Models.UserProfile", b =>
-                {
-                    b.Navigation("Customers");
                 });
 #pragma warning restore 612, 618
         }

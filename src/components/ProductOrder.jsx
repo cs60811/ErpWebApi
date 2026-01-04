@@ -1,15 +1,54 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const ProductOrder = ({ erpId }) => {
+const ProductOrder = ({ userId }) => {
+  const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const products = [
-    { id: 1, name: 'Premium Wireless Headphones', price: 2999, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop' },
-    { id: 2, name: 'Mechanical Gaming Keyboard', price: 1500, image: 'https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?w=200&h=200&fit=crop' },
-    { id: 3, name: '4K Ultra HD Monitor', price: 8500, image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=200&h=200&fit=crop' },
-    { id: 4, name: 'Ergonomic Office Chair', price: 4200, image: 'https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?w=200&h=200&fit=crop' },
-  ];
+  // Get API URL helper
+  const getApiUrl = () => {
+    let url = import.meta.env.VITE_API_URL || '/api';
+    if (url.endsWith('/Line')) {
+      url = url.substring(0, url.length - 5);
+    }
+    return url;
+  };
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        const apiUrl = getApiUrl();
+        // 呼叫我們實作的 T357 Product_Query API
+        const response = await fetch(`${apiUrl}/Product/query?userId=${userId}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+          // T357Response<ProductQueryMaster> 結構中的 MasterData
+          setProducts(data.masterData || []);
+        } else {
+          setError(data.message || 'Failed to fetch products');
+        }
+      } catch (err) {
+        setError('Error connecting to backend');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (userId && userId !== 'U_DEMO_12345') {
+      fetchProducts();
+    } else {
+      // Demo mode fallback
+      setProducts([
+        { prodID: 'DEMO-001', prodName: 'Demo Product 1', unit: 'PCS', bCurrStock: 100 },
+        { prodID: 'DEMO-002', prodName: 'Demo Product 2', unit: 'BOX', bCurrStock: 50 },
+      ]);
+    }
+  }, [userId]);
 
   const addToCart = (product) => {
     setCart([...cart, { ...product, cartId: Date.now() }]);
@@ -20,63 +59,51 @@ const ProductOrder = ({ erpId }) => {
   };
 
   const handleSubmitOrder = async () => {
-    if (!erpId) {
-      alert('Please bind your ERP account first!');
-      return;
-    }
-    
     setSubmitting(true);
-    // Simulate API call to ERP WebAPI /order/create
-    const orderData = {
-      customerId: erpId,
-      items: cart.map(item => ({ id: item.id, qty: 1 })),
-      timestamp: new Date().toISOString()
-    };
-    
-    console.log('Sending order to ERP:', orderData);
-    
+    // 未來實作 Order_Create 介接
     setTimeout(() => {
       setSubmitting(false);
       setCart([]);
-      alert('Order Placed Successfully! Sent to ERP WebAPI.');
-    }, 2000);
+      alert('Order Placed! (This will be sent to T357 Order_Create in the next phase)');
+    }, 1500);
   };
 
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
+  const total = cart.length; // Simplified for T357 demo
 
   return (
     <div className="order-system">
       <div className="products-grid">
+        {loading && <p>Loading products from ERP...</p>}
+        {error && <p className="error-msg">{error}</p>}
+        {!loading && !error && products.length === 0 && <p>No products found in ERP.</p>}
+        
         {products.map(product => (
-          <div key={product.id} className="product-card">
-            <img src={product.image} alt={product.name} />
-            <h4>{product.name}</h4>
-            <p className="price">${product.price}</p>
-            <button onClick={() => addToCart(product)}>Add to Cart</button>
+          <div key={product.prodID} className="product-card">
+            <div className="prod-img-placeholder">📦</div>
+            <h4>{product.prodName}</h4>
+            <p className="prod-id">{product.prodID}</p>
+            <p className="stock">Stock: {product.bCurrStock} {product.unit}</p>
+            <button onClick={() => addToCart(product)}>Add to Order</button>
           </div>
         ))}
       </div>
 
       <div className="cart-section">
-        <h3>Shopping Cart ({cart.length})</h3>
+        <h3>Current Order ({cart.length})</h3>
         {cart.length === 0 ? (
-          <p className="empty-msg">Your cart is empty.</p>
+          <p className="empty-msg">No items selected.</p>
         ) : (
           <>
             <ul className="cart-list">
               {cart.map(item => (
                 <li key={item.cartId}>
-                  <span>{item.name}</span>
-                  <span className="price">${item.price}</span>
+                  <span>{item.prodName}</span>
+                  <span className="qty">1 {item.unit}</span>
                   <button className="remove-btn" onClick={() => removeFromCart(item.cartId)}>×</button>
                 </li>
               ))}
             </ul>
             <div className="cart-footer">
-              <div className="total">
-                <span>Total:</span>
-                <span>${total}</span>
-              </div>
               <button 
                 className="checkout-btn" 
                 onClick={handleSubmitOrder}

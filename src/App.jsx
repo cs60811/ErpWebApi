@@ -14,12 +14,22 @@ function App() {
   const [recordStatus, setRecordStatus] = useState('Pending');
   const [liffLoggedIn, setLiffLoggedIn] = useState(false);
 
+  // Helper to get clean API URL
+  const getApiUrl = () => {
+    let url = import.meta.env.VITE_API_URL || '/api';
+    // Remove /Line if it exists to avoid duplication
+    if (url.endsWith('/Line')) {
+      url = url.substring(0, url.length - 5);
+    }
+    return url;
+  };
+
   // Backend API connection
   const recordAccount = async (profile) => {
     try {
       setRecordStatus('Recording...');
-      const apiUrl = import.meta.env.VITE_API_URL;
-      const response = await fetch(`${apiUrl}/line/record`, {
+      const apiUrl = getApiUrl();
+      const response = await fetch(`${apiUrl}/Line/record`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -31,9 +41,20 @@ function App() {
       });
       if (response.ok) {
         const result = await response.json();
+        console.log('Backend Record Response:', result);
         setRecordStatus('Success');
-        if (result.data && result.data.isErpBound) {
-          setErpAccount({ erpId: result.data.erpId });
+        
+        // 更嚴格的檢查，確保資料結構正確
+        if (result.success && result.data && result.data.customers && result.data.customers.length > 0) {
+          const binding = result.data.customers[0];
+          console.log('Found binding:', binding);
+          if (binding.erpUser) {
+            setErpAccount({ 
+              erpCode: binding.erpUser.erpCode, 
+              uid: binding.customerUid 
+            });
+            setActiveTab('order');
+          }
         }
       } else throw new Error('Failed to record');
     } catch (err) {
@@ -44,8 +65,8 @@ function App() {
 
   const fetchData = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL;
-      const response = await fetch(`${apiUrl}/line/dashboard`);
+      const apiUrl = getApiUrl();
+      const response = await fetch(`${apiUrl}/Line/dashboard`);
       if (response.ok) {
         const data = await response.json();
         setAppData(data);
@@ -100,6 +121,7 @@ function App() {
 
   const handleErpBind = (data) => {
     setErpAccount(data);
+    setActiveTab('order'); // 綁定成功後自動跳轉
   };
 
   const handleDemo = () => {
@@ -128,7 +150,9 @@ function App() {
           <nav className="tabs">
             <button className={activeTab === 'dashboard' ? 'active' : ''} onClick={() => setActiveTab('dashboard')}>Profile</button>
             <button className={activeTab === 'binding' ? 'active' : ''} onClick={() => setActiveTab('binding')}>ERP Bind</button>
-            <button className={activeTab === 'order' ? 'active' : ''} onClick={() => setActiveTab('order')}>New Order</button>
+            {erpAccount && (
+              <button className={activeTab === 'order' ? 'active' : ''} onClick={() => setActiveTab('order')}>New Order</button>
+            )}
           </nav>
         )}
       </header>
@@ -171,7 +195,7 @@ function App() {
 
                 <div className="erp-status-card">
                   <p>ERP Connection: <span className={erpAccount ? 'text-success' : 'text-warning'}>
-                    {erpAccount ? `Connected (${erpAccount.erpId})` : 'Disconnected'}
+                    {erpAccount ? `Connected (${erpAccount.erpCode})` : 'Disconnected'}
                   </span></p>
                 </div>
                 <button onClick={handleLogout} className="logout-btn">Logout</button>
@@ -187,7 +211,7 @@ function App() {
             )}
 
             {activeTab === 'order' && (
-              <ProductOrder erpId={erpAccount?.erpId} />
+              <ProductOrder userId={profile.userId} />
             )}
           </div>
         )}

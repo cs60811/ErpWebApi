@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 
 const ERPBinding = ({ userId, erpAccount, onBind }) => {
-  const [erpId, setErpId] = useState(erpAccount?.erpId || '');
-  const [password, setPassword] = useState('');
+  const [erpCode, setErpCode] = useState(erpAccount?.erpCode || '');
+  const [uid, setUid] = useState(erpAccount?.uid || '');
+  const [upwd, setUpwd] = useState('');
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState(erpAccount?.erpId ? 'Bound' : 'Not Bound');
+  const [status, setStatus] = useState(erpAccount?.erpCode ? 'Bound' : 'Not Bound');
 
-  // Update local state if erpAccount prop changes
   useEffect(() => {
-    if (erpAccount?.erpId) {
-      setErpId(erpAccount.erpId);
+    if (erpAccount?.erpCode) {
+      setErpCode(erpAccount.erpCode);
+      setUid(erpAccount.uid);
       setStatus('Bound');
     }
   }, [erpAccount]);
@@ -19,14 +20,20 @@ const ERPBinding = ({ userId, erpAccount, onBind }) => {
     setLoading(true);
     
     try {
-      const apiUrl = import.meta.env.VITE_API_URL;
-      const response = await fetch(`${apiUrl}/line/bind-erp`, {
+      // 修正 URL 拼接問題，確保不出現重複的 /Line/line
+      let apiUrl = import.meta.env.VITE_API_URL || '/api';
+      if (apiUrl.endsWith('/Line')) {
+        apiUrl = apiUrl.substring(0, apiUrl.length - 5);
+      }
+      
+      const response = await fetch(`${apiUrl}/Line/bind-erp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: userId,
-          erpId: erpId,
-          password: password
+          erpCode: erpCode,
+          uid: uid,
+          upwd: upwd
         })
       });
 
@@ -35,7 +42,7 @@ const ERPBinding = ({ userId, erpAccount, onBind }) => {
       if (response.ok && result.success) {
         setLoading(false);
         setStatus('Bound');
-        onBind({ erpId: result.erpId });
+        onBind({ erpCode, uid });
         alert('ERP Account Bound Successfully!');
       } else {
         throw new Error(result.message || 'Failed to bind ERP account');
@@ -55,21 +62,31 @@ const ERPBinding = ({ userId, erpAccount, onBind }) => {
       {status !== 'Bound' ? (
         <form onSubmit={handleBind}>
           <div className="input-group">
-            <label>ERP Customer ID</label>
+            <label>Level 1 ERP Code (系統代碼)</label>
             <input 
               type="text" 
-              value={erpId} 
-              onChange={(e) => setErpId(e.target.value)} 
-              placeholder="Enter your ERP ID"
+              value={erpCode} 
+              onChange={(e) => setErpCode(e.target.value)} 
+              placeholder="例如: CORP_001"
               required
             />
           </div>
           <div className="input-group">
-            <label>ERP Password / PIN</label>
+            <label>Level 2 Account (您的帳號)</label>
+            <input 
+              type="text" 
+              value={uid} 
+              onChange={(e) => setUid(e.target.value)} 
+              placeholder="Enter your account"
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label>ERP Password (密碼)</label>
             <input 
               type="password" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
+              value={upwd} 
+              onChange={(e) => setUpwd(e.target.value)} 
               placeholder="Enter password"
               required
             />
@@ -80,7 +97,8 @@ const ERPBinding = ({ userId, erpAccount, onBind }) => {
         </form>
       ) : (
         <div className="bound-info">
-          <p>Linked to ERP ID: <strong>{erpId || 'ERP-88291'}</strong></p>
+          <p>Linked to ERP: <strong>{erpCode}</strong></p>
+          <p>Account: <strong>{uid}</strong></p>
           <button className="secondary-btn" onClick={() => setStatus('Not Bound')}>Unbind Account</button>
         </div>
       )}
